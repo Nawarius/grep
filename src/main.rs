@@ -1,10 +1,14 @@
 use std::env;
 use std::fs;
+use std::process;
 
 fn main() {
     let args: Vec<String> = env::args().collect::<Vec<String>>();
 
-    let config: Config = Config::new(&args);
+    let config = Config::build(&args).unwrap_or_else(|err| {
+        println!("Fail parsing command line arguments: {}", err);
+        process::exit(1);
+    });
 
     println!("Searching string is: {}", config.query);
     println!("Filename is: {}", config.filename);
@@ -19,11 +23,10 @@ struct Config {
 }
 
 impl Config {
-    fn new (args: &[String]) -> Self {
-        Config {
-            query: args[1].clone(),
-            filename: args[2].clone()
-        }
+    fn build (args: &[String]) -> Result<Self, &'static str> {
+        if args.len() < 3 { return Err("Not enough arguments") }
+
+        Ok(Config { query: args[1].clone(), filename: args[2].clone() })
     }
 }
 
