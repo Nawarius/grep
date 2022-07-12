@@ -11,9 +11,6 @@ fn main() {
         process::exit(1);
     });
 
-    println!("Searching string is: {}", config.query);
-    println!("Filename is: {}", config.filename);
-
     if let Err(err) = grep::run(config) {
         println!("Application error: {}", err);
         process::exit(1);
