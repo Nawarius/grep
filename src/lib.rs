@@ -47,26 +47,19 @@ pub fn run (config: Config) -> Result<(), Box<dyn Error>> {
 }
 
 pub fn search_sensitive <'a, 'b> (query: &'a str, contents: &'b str) -> Vec<&'b str> {
-    let mut results: Vec<&'b str> = Vec::new();
-
-    for line in contents.lines() {
-        if line.contains(query) {
-            results.push(line);
-        }
-    }
-    results
+    contents
+        .lines()
+        .filter(|line| line.contains(query))
+        .collect()
 }
 
 pub fn search_insensitive <'a, 'b> (query: &'a str, contents: &'b str) -> Vec<&'b str> {
-    let mut results: Vec<&'b str> = Vec::new();
     let query = query.to_lowercase();
 
-    for line in contents.lines() {
-        if line.to_lowercase().contains(&query) {
-            results.push(line);
-        }
-    }
-    results
+    contents
+        .lines()
+        .filter(|line| line.to_lowercase().contains(&query))
+        .collect()
 }
 
 #[cfg(test)]
