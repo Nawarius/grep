@@ -9,12 +9,22 @@ pub struct Config {
 }
 
 impl Config {
-    pub fn build (args: &[String]) -> Result<Self, &'static str> {
-        if args.len() < 3 { return Err("Not enough arguments") }
+    pub fn build (mut args: impl Iterator<Item = String>) -> Result<Self, &'static str> {
+        args.next();
+
+        let query = match args.next() {
+            Some(arg) => arg,
+            None => return Err("Didn`t get a query string")
+        };
+
+        let filename = match args.next() {
+            Some(arg) => arg,
+            None => return Err("Didn`t get a file path")
+        };
 
         Ok(Config { 
-            query: args[1].clone(), 
-            filename: args[2].clone(),
+            query, 
+            filename,
             ignore_case: env::var("IGNORE_CASE").is_ok() 
         })
     }
@@ -22,7 +32,7 @@ impl Config {
 
 pub fn run (config: Config) -> Result<(), Box<dyn Error>> {
     let content: String = fs::read_to_string(config.filename)?;
-    
+
     let results = if config.ignore_case {
         search_insensitive(&config.query, &content)
     } else {
